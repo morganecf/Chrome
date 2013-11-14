@@ -1,0 +1,148 @@
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
+
+<script type="text/javascript">
+
+function reverseGeocode(results, status) {
+	if ((status == google.maps.GeocoderStatus.OK) && results[1]) {
+        alert(results[0].formatted_address)
+        for (var i=0; i<results[0].address_components.length; i++) {
+        	for (var b=0;b<results[0].address_components[i].types.length;b++) {
+	            if (results[0].address_components[i].types[b] == "administrative_area_level_1") {
+	            	city= results[0].address_components[i];
+	            	break;
+	            }
+            }
+        }
+        alert(city.short_name + " " + city.long_name)
+    } 
+    else {
+          alert("No results found");
+    }
+};
+
+function buildGeoURL(lat, lng) {
+	return "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text%3D%22"+lat+"%2C"+lng+"%22%20and%20gflags%3D%22R%22&format=json";
+};
+
+function locate(lat, lng) {
+	var geoURL = buildGeoURL(lat, lng);
+	
+	$.getJSON(geoURL, function(data) {
+		alert(data.query.results.Result.woeid);
+		getWeather(data.query.results.Result.woeid);
+	});
+
+	/*var geocoder = new google.maps.Geocoder();
+    var latlng = new google.maps.LatLng(lat, lng);
+    geocoder.geocode({"latLng": latlng}, function(results, status) { reverseGeocode(results, status) });*/
+};
+
+function displayWeather(picname) {
+	var path = 'backgrounds/'+picname;
+	document.getElementById("background").src = path;
+};
+
+/*
+* TODO: Can put weather codes in global hashtable with overridden get method that finds closest code 
+* Will facilitate adding more pictures 
+* Also way too many if statements 
+*/
+function getWeather(lat, lng) {
+	var queryTest4 = "http://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lng+"&callback=?";
+
+	// Asynchronous call 
+	$.getJSON(queryTest4, function(data) {
+		alert(data.weather[0].main);
+
+		var code = data.weather[0].id;
+		var imgsrc = '';
+		if ( 232 >= code >= 200 ) {
+			imgsrc = 'thunderstorm.jpg';
+		}
+		else if ( (321 >= code >= 300) || (522 >= code >= 500) ) {
+			imgsrc = 'rain.jpg';
+		}
+		else if ( 621 >= code >= 621 ) {
+			imgsrc = 'snow.jpg';
+		}
+		else if ( code == 701 || code == 721 ) {
+			imgsrc = 'mist.jpg';
+		}
+		else if ( code == 741 ) {
+			imgsrc = 'fog.jpg';
+		}
+		else if ( code == 800 ) {
+			imgsrc = 'clear.jpg';
+		}
+		else if ( code == 801 ) {
+			imgsrc = 'few_clouds.jpg';
+		}
+		else if ( code == 802 || code == 803 ) {
+			imgsrc = 'scattered_clouds.jpg';
+		}
+		else if ( code == 804 ) {
+			imgsrc = 'overcast.jpg';
+		}
+
+		alert(imgsrc);
+
+		displayWeather(imgsrc);
+	});
+};
+
+function success(position) {
+	var latitude = position.coords.latitude;
+	var longitude = position.coords.longitude;
+	alert(latitude + ", " + longitude);
+	getWeather(latitude, longitude);
+};
+
+function displayError(errorstr) {
+	alert(errorstr);
+};
+
+function error(err) {
+	switch(err.code) {
+		case error.PERMISSION_DENIED:
+			return displayError("You denied me permission to display the weather :(");
+		case error.POSITION_UNAVAILABLE:
+			return displayError("Your position is unavailable :(");
+		case error.TIMEOUT:
+			return displayError("Oops...timed out :(");
+	}
+	return displayError("I don't know what's going on! :(")
+};
+
+function getLocation() {
+
+	if (!navigator.geolocation) {
+		return "Geolocation is not supported :(";
+	}
+	navigator.geolocation.getCurrentPosition(success, error);
+
+};
+
+
+</script>
+
+<style>
+
+#background {
+	width: 100%;
+	height:100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+</style>
+
+<html>
+
+<body onload="getLocation()"> 
+	<img id="background"/>
+</body>
+
+</html>

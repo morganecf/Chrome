@@ -1,0 +1,37 @@
+<!doctype html>
+
+<script src="weather.js"> 
+// Run script to generate background when DOM elements are ready
+// Or should do this WHILE DOM elements are loading? Since want to load background at the same time? 
+document.addEventListener('DOMContentLoaded', function () {
+	alert("wtf")
+	backgroundGenerator.generateBackground();
+});
+</script>
+
+<html>
+	<head>
+		<title> Weather extension </title>
+
+		<style>
+			#background {
+				width: 100%;
+				height:100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			#error {
+				display:none;
+			}
+		</style>
+
+		<script src="jquery-1.10.2.min.js"></script>
+
+		<body> 
+			<img id="background" />
+			<div id="error"></div>
+		</body>
+
+	</head>
+</html>

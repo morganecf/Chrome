@@ -1,0 +1,11 @@
+{
+  "manifest_version": 2,
+
+  "name": "Weather",
+  "description": "This extension displays a picture of the current weather upon opening a new browser tab.",
+  "version": "1.0",
+
+  "chrome_url_overrides" : {
+    "newtab": "weather.html"
+  }
+}
